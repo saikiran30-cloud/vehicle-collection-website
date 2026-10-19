@@ -485,11 +485,12 @@ async function deleteVehicle(id) {
 // CAMERA SUPPORT
 // --------------------------------------------------
 
+
 async function startCamera() {
   const video = $("camera-video");
 
   if (!video) {
-    showMessage("Camera preview is not present in your dashboard.", "error");
+    showMessage("Camera preview is not present.", "error");
     return;
   }
 
@@ -501,11 +502,25 @@ async function startCamera() {
 
     video.srcObject = cameraStream;
     video.hidden = false;
+    video.style.display = "block";
+    video.style.visibility = "visible";
+    video.style.width = "100%";
+    video.style.maxWidth = "640px";
+    video.style.height = "auto";
 
     await video.play();
+
+    showMessage("Camera started successfully.", "success");
   } catch (error) {
+    console.error("Camera error:", error);
+
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+    }
+
     showMessage(
-      "Could not open the camera. Check browser camera permission.",
+      "Could not open camera. Check browser permission.",
       "error"
     );
   }
@@ -513,7 +528,7 @@ async function startCamera() {
 
 function stopCamera() {
   if (cameraStream) {
-    cameraStream.getTracks().forEach((track) => track.stop());
+    cameraStream.getTracks().forEach(track => track.stop());
     cameraStream = null;
   }
 
@@ -522,8 +537,10 @@ function stopCamera() {
   if (video) {
     video.srcObject = null;
     video.hidden = true;
+    video.style.display = "none";
   }
 }
+
 
 async function captureCameraPhoto() {
   const video = $("camera-video");
