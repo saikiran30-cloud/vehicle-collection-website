@@ -1,0 +1,344 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>Vehicle Collection Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="topbar">
+    <a class="brand" href="/">
+        <span class="brand-mark small">VC</span>
+        <span>
+            Vehicle Collection
+            <small>PRIVATE DASHBOARD</small>
+        </span>
+    </a>
+
+    <form method="post" action="{{ url_for('logout') }}">
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+        <button class="secondary" type="submit">Log out</button>
+    </form>
+</header>
+
+<main class="container">
+
+    <!-- Page heading -->
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">COLLECTION OVERVIEW</p>
+            <h1>Daily register</h1>
+            <p class="muted">
+                Scan a plate, record the amount, and track every payment.
+            </p>
+        </div>
+
+
+        <button class="primary" id="add-row-top" type="button">
+            + Add vehicle
+        </button>
+
+        <a class="primary" href="{{ url_for('supplies_page') }}">
+            Supply
+        </a>
+    </section>
+
+    <!-- Collection totals -->
+    <section class="stats-grid">
+
+        <article class="stat-card">
+            <span class="stat-icon">🚘</span>
+            <p class="muted">Total vehicles</p>
+            <strong id="vehicle-count">0</strong>
+        </article>
+
+        <article class="stat-card total">
+            <span class="stat-icon">₹</span>
+            <p>Total collected</p>
+            <strong id="total-amount">₹0</strong>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-icon">↗</span>
+            <p class="muted">Google Pay</p>
+            <strong id="gpay-total">₹0</strong>
+            <small id="gpay-count">0 vehicles</small>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-icon">↗</span>
+            <p class="muted">PhonePe</p>
+            <strong id="phonepe-total">₹0</strong>
+            <small id="phonepe-count">0 vehicles</small>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-icon">₹</span>
+            <p class="muted">Cash</p>
+            <strong id="cash-total">₹0</strong>
+            <small id="cash-count">0 vehicles</small>
+        </article>
+
+    </section>
+
+    <!-- Add vehicle form -->
+    <section class="panel">
+
+        <div class="panel-heading">
+            <div>
+                <h2>Add a vehicle</h2>
+                <p class="muted">
+                    Capture a photo using your camera or choose an existing photo.
+                </p>
+            </div>
+        </div>
+
+        <div class="scanner-layout">
+
+            <!-- Camera and photo section -->
+            <div class="photo-box">
+
+                <div class="camera-symbol">📷</div>
+
+                <p id="photo-label">No photo selected</p>
+
+                <!-- Captured or selected photo preview -->
+                <img
+                    id="photo-preview"
+                    alt="Selected vehicle preview"
+                    hidden
+                >
+
+                <!-- Camera controls -->
+                <div class="camera-controls">
+
+                    <button
+                        type="button"
+                        id="start-camera"
+                        class="secondary"
+                    >
+                        Start Camera
+                    </button>
+
+                    <button
+                        type="button"
+                        id="capture-camera"
+                        class="primary"
+                    >
+                        Capture Photo
+                    </button>
+
+                    <button
+                        type="button"
+                        id="stop-camera"
+                        class="secondary"
+                    >
+                        Stop Camera
+                    </button>
+
+                </div>
+
+                <!-- Live camera preview -->
+                <video
+                    id="camera-video"
+                    autoplay
+                    playsinline
+                    style="display:none; width:100%; max-width:400px;"
+                ></video>
+
+                <!-- Canvas used for capturing a camera frame -->
+                <canvas
+                    id="camera-canvas"
+                    style="display:none;"
+                ></canvas>
+
+                <!-- Choose photo from the device -->
+                <div class="photo-actions">
+
+                    <label
+                        class="button secondary"
+                        for="photo-input"
+                    >
+                        Choose Photo
+                    </label>
+
+                    <input
+                        id="photo-input"
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        hidden
+                    >
+
+                    <button
+                        id="scan-button"
+                        class="primary"
+                        type="button"
+                    >
+                        Scan Number Plate
+                    </button>
+
+                </div>
+
+                <p class="tiny muted">
+                    Position the number plate clearly. Check the detected
+                    registration number before saving.
+                </p>
+
+            </div>
+
+            <!-- Vehicle details -->
+            <div class="entry-fields">
+
+                <label>
+                    Vehicle number
+
+                    <input
+                        id="vehicle-number"
+                        type="text"
+                        placeholder="e.g. TS09AB1234"
+                        autocomplete="off"
+                    >
+                </label>
+
+                <div class="field-row">
+
+                    <label>
+                        Amount (₹)
+
+                        <input
+                            id="amount"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value="0"
+                        >
+                    </label>
+
+                    <label>
+                        Payment method
+
+                        <select id="payment-method">
+                            <option>Google Pay</option>
+                            <option>PhonePe</option>
+                            <option selected>Cash</option>
+                        </select>
+                    </label>
+
+                </div>
+
+                <button
+                    id="save-button"
+                    class="primary full"
+                    type="button"
+                >
+                    Save Vehicle Record
+                </button>
+
+                <p class="tiny muted">
+                    The payment method is recorded for your register.
+                    Selecting Google Pay or PhonePe does not verify
+                    that a payment was actually received.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div
+            id="status-message"
+            class="status-message"
+            role="status"
+            aria-live="polite"
+        ></div>
+
+    </section>
+
+    <!-- Saved vehicle records -->
+    <section class="panel">
+
+        <div class="table-heading">
+            <div>
+                <h2>Vehicle records</h2>
+                <p class="muted">
+                    Edit a record and press Save on its row.
+                </p>
+            </div>
+
+            <input
+                id="search-box"
+                class="search"
+                type="search"
+                placeholder="Search plate or payment..."
+                aria-label="Search records"
+            >
+        </div>
+
+        <div class="table-wrap">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Photo</th>
+                        <th>Vehicle number</th>
+                        <th>Amount (₹)</th>
+                        <th>Payment method</th>
+                        <th>Date / time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="records-body">
+                    <tr>
+                        <td colspan="6" class="empty">
+                            Loading records...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="panel-footer">
+            <span id="record-summary">0 records</span>
+
+            <button
+                id="export-button"
+                class="secondary"
+                type="button"
+            >
+                Export CSV
+            </button>
+        </div>
+
+    </section>
+    
+    <footer>
+
+        Keep your password private. Back up your database regularly.
+    </footer>
+
+</main>
+
+<!-- Load the existing JavaScript file -->
+<script
+    src="{{ url_for('static', filename='app.js') }}"
+    defer
+></script>
+
+</body>
+</html>

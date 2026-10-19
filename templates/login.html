@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · Vehicle Collection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <div class="brand-mark">VC</div>
+    <p class="eyebrow">PRIVATE COLLECTION REGISTER</p>
+    <h1>Welcome back</h1>
+    <p class="muted">Sign in to manage vehicle photos and payments.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}<div class="notice {{ category }}">{{ message }}</div>{% endfor %}
+    {% endwith %}
+    <form method="post" class="login-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Username<input name="username" autocomplete="username" required placeholder="Your username"></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required placeholder="Your password"></label>
+      <button class="primary full" type="submit">Sign in securely</button>
+    </form>
+    <p class="tiny muted">Only use this site over HTTPS when deployed online.</p>
+  </main>
+</body>
+</html>

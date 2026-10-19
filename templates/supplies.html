@@ -1,0 +1,108 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Shampoo Supply Register</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="{{ url_for('dashboard') }}">
+        <span class="brand-mark small">VC</span>
+        <span>SAI KIRAN CAR CARE
+            <small>SHAMPOO SUPPLY</small>
+        </span>
+    </a>
+    <a class="primary" href="{{ url_for('dashboard') }}">
+        Back to Dashboard
+    </a>
+</header>
+
+<main class="container">
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">SAI KIRAN CAR CARE</p>
+            <h1>Shampoo Supply Register</h1>
+            <p class="muted">Record materials, quantities and amounts.</p>
+        </div>
+    </section>
+
+    <section class="panel">
+        <form id="supply-form">
+            <label>
+                Washing centre / customer name
+                <input id="supply-customer" type="text"
+                       maxlength="150" placeholder="e.g. Sree Car Wash"
+                       required>
+            </label>
+
+            <label>
+                Supply date
+                <input id="supply-date" type="date" required>
+            </label>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Material / shampoo name</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Amount (₹)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supply-items-body"></tbody>
+                </table>
+            </div>
+
+            <div class="camera-controls">
+                <button class="secondary" type="button"
+                        id="add-supply-item">
+                    + Add another material
+                </button>
+                <strong>Entry total:
+                    <span id="supply-entry-total">₹0</span>
+                </strong>
+            </div>
+
+            <button class="primary full" type="submit" id="save-supply">
+                Save Shampoo Supply
+            </button>
+<div class="supply-save-actions">
+    <p id="supply-message" class="status-message"
+       role="status" aria-live="polite"></p>
+
+    <button
+        type="button"
+        id="add-more-supply"
+        class="secondary"
+        hidden
+    >
+        + Add More Items
+    </button>
+</div>        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Customer Supply History</h2>
+        <p class="muted">Search to see a customer's saved supplies.</p>
+        <label>
+            Search washing centre
+            <input id="supply-search" type="search"
+                   placeholder="Type Sree Car Wash..."
+                   autocomplete="off">
+        </label>
+        <div id="supply-history">
+            <p class="muted">Loading supply history...</p>
+        </div>
+    </section>
+</main>
+
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
